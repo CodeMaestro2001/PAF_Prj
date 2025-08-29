@@ -3,18 +3,18 @@ import axiosInstance from "./axiosConfig";
 
 /**
  * Get posts by user
- *    GET /api/posts/user/{email}
+ * GET /api/posts/user/{email}
  */
 export const getPostsByUser = async (userEmail) => {
   const response = await axiosInstance.get(`/posts/user/${userEmail}`, {
-    withCredentials: true, // if using session cookies
+    withCredentials: true,
   });
   return response.data;
 };
 
 /**
- * Get a single post by its ID
- *    GET /api/posts/:id
+ * Get a single post by ID
+ * GET /api/posts/:id
  */
 export const getPostById = async (postId) => {
   const response = await axiosInstance.get(`/posts/${postId}`, {
@@ -25,7 +25,7 @@ export const getPostById = async (postId) => {
 
 /**
  * Create a post (JSON version)
- *    POST /api/posts
+ * POST /api/posts
  */
 export const createPost = async (postData) => {
   const response = await axiosInstance.post("/posts", postData, {
@@ -35,8 +35,8 @@ export const createPost = async (postData) => {
 };
 
 /**
- * Create a post with multipart/form-data (for file uploads)
- *    POST /api/posts
+ * Create a post with media (multipart)
+ * POST /api/posts
  */
 export const uploadPostWithMedia = async (postData, files) => {
   const formData = new FormData();
@@ -59,23 +59,59 @@ export const uploadPostWithMedia = async (postData, files) => {
 
 /**
  * Like a post
- *    POST /api/posts/:id/like
+ * POST /api/posts/:id/like
  */
-export const likePost = async (postId) => {
-  const response = await axiosInstance.post(`/posts/${postId}/like`, null, {
-    withCredentials: true,
-  });
+export const likePost = async (postId, userId) => {
+  const response = await axiosInstance.post(
+    `/posts/${postId}/like`,
+    { userId },
+    {
+      withCredentials: true,
+      headers: { "Content-Type": "application/json" },
+    }
+  );
   return response.data;
 };
 
 /**
  * Add a comment to a post
- *    POST /api/posts/:id/comments
+ * POST /api/posts/:id/comments
  */
 export const addComment = async (postId, commentText) => {
   const response = await axiosInstance.post(
     `/posts/${postId}/comments`,
     { commentText },
+    {
+      withCredentials: true,
+      headers: { "Content-Type": "application/json" },
+    }
+  );
+  return response.data;
+};
+
+/**
+ * Edit a comment
+ * PUT /api/posts/:postId/comments/:commentId
+ */
+export const updateComment = async (postId, commentId, commentText) => {
+  const response = await axiosInstance.put(
+    `/posts/${postId}/comments/${commentId}`,
+    { commentText },
+    {
+      withCredentials: true,
+      headers: { "Content-Type": "application/json" },
+    }
+  );
+  return response.data;
+};
+
+/**
+ * Delete a comment
+ * DELETE /api/posts/:postId/comments/:commentId
+ */
+export const deleteComment = async (postId, commentId) => {
+  const response = await axiosInstance.delete(
+    `/posts/${postId}/comments/${commentId}`,
     { withCredentials: true }
   );
   return response.data;
@@ -83,7 +119,7 @@ export const addComment = async (postId, commentText) => {
 
 /**
  * Delete a post
- *    DELETE /api/posts/:id
+ * DELETE /api/posts/:id
  */
 export const deletePost = async (postId) => {
   const response = await axiosInstance.delete(`/posts/${postId}`, {
@@ -94,21 +130,24 @@ export const deletePost = async (postId) => {
 
 /**
  * Get all posts
- *    GET /api/posts
+ * GET /api/posts
  */
 export const getAllPosts = async () => {
-  // Adding withCredentials here too, to match the rest:
   const response = await axiosInstance.get("/posts", {
     withCredentials: true,
   });
   return response.data;
 };
 
-// 8) Update a post (PUT /posts/:id)
+/**
+ * Update a post
+ * PUT /api/posts/:id
+ */
 export const updatePost = async (postId, updatedPostData) => {
-  // updatedPostData = { description, hashtags: [...], mediaUrls: [...] }
-  const response = await axiosInstance.put(`/posts/${postId}`, updatedPostData, {
-    withCredentials: true,
-  });
+  const response = await axiosInstance.put(
+    `/posts/${postId}`,
+    updatedPostData,
+    { withCredentials: true }
+  );
   return response.data;
 };
